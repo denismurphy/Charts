@@ -56,7 +56,7 @@ public class BarChartRenderer: ChartDataRendererBase
         {
             var set = barData.getDataSetByIndex(i)
             
-            if (set !== nil && set!.isVisible)
+            if set !== nil && set!.isVisible && set.entryCount > 0
             {
                 drawDataSet(context: context, dataSet: set as! BarChartDataSet, index: i)
             }
@@ -92,8 +92,8 @@ public class BarChartRenderer: ChartDataRendererBase
             var e = entries[j]
             
             // calculate the x-position, depending on datasetcount
-            var x = CGFloat(e.xIndex + j * dataSetOffset) + CGFloat(index)
-                + groupSpace * CGFloat(j) + groupSpaceHalf
+            var x = CGFloat(e.xIndex + e.xIndex * dataSetOffset) + CGFloat(index)
+                + groupSpace * CGFloat(e.xIndex) + groupSpaceHalf
             var vals = e.values
             
             if (!containsStacks || vals == nil)
@@ -293,7 +293,7 @@ public class BarChartRenderer: ChartDataRendererBase
             {
                 var dataSet = dataSets[i] as! BarChartDataSet
                 
-                if (!dataSet.isDrawValuesEnabled)
+                if !dataSet.isDrawValuesEnabled || dataSet.entryCount == 0
                 {
                     continue
                 }

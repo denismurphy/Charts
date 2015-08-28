@@ -51,8 +51,8 @@ public class HorizontalBarChartRenderer: BarChartRenderer
             var e = entries[j]
             
             // calculate the x-position, depending on datasetcount
-            var x = CGFloat(e.xIndex + j * dataSetOffset) + CGFloat(index)
-                + groupSpace * CGFloat(j) + groupSpaceHalf
+            var x = CGFloat(e.xIndex + e.xIndex * dataSetOffset) + CGFloat(index)
+                + groupSpace * CGFloat(e.xIndex) + groupSpaceHalf
             let values = e.values
             
             if (!containsStacks || values == nil)
@@ -260,7 +260,7 @@ public class HorizontalBarChartRenderer: BarChartRenderer
             {
                 var dataSet = dataSets[i] as! BarChartDataSet
                 
-                if (!dataSet.isDrawValuesEnabled)
+                if !dataSet.isDrawValuesEnabled || dataSet.entryCount == 0
                 {
                     continue
                 }

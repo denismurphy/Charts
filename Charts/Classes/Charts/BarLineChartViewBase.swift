@@ -13,7 +13,7 @@
 
 import Foundation
 import CoreGraphics
-import UIKit.UIGestureRecognizer
+import UIKit
 
 /// Base-class of LineChart, BarChart, ScatterChart and CandleStickChart.
 public class BarLineChartViewBase: ChartViewBase, UIGestureRecognizerDelegate
@@ -61,10 +61,10 @@ public class BarLineChartViewBase: ChartViewBase, UIGestureRecognizerDelegate
     
     internal var _xAxisRenderer: ChartXAxisRenderer!
     
-    private var _tapGestureRecognizer: UITapGestureRecognizer!
-    private var _doubleTapGestureRecognizer: UITapGestureRecognizer!
-    private var _pinchGestureRecognizer: UIPinchGestureRecognizer!
-    private var _panGestureRecognizer: UIPanGestureRecognizer!
+    internal var _tapGestureRecognizer: UITapGestureRecognizer!
+    internal var _doubleTapGestureRecognizer: UITapGestureRecognizer!
+    internal var _pinchGestureRecognizer: UIPinchGestureRecognizer!
+    internal var _panGestureRecognizer: UIPanGestureRecognizer!
     
     /// flag that indicates if a custom viewport offset has been set
     private var _customViewPortEnabled = false
@@ -319,38 +319,61 @@ public class BarLineChartViewBase: ChartViewBase, UIGestureRecognizerDelegate
         _chartXMax = Double(_data.xVals.count - 1)
         _deltaX = CGFloat(abs(_chartXMax - _chartXMin))
         
-        _leftAxis.axisMaximum = !isnan(_leftAxis.customAxisMax) ? _leftAxis.customAxisMax : (maxLeft + topSpaceLeft)
-        _rightAxis.axisMaximum = !isnan(_rightAxis.customAxisMax) ? _rightAxis.customAxisMax : (maxRight + topSpaceRight)
-        _leftAxis.axisMinimum = !isnan(_leftAxis.customAxisMin) ? _leftAxis.customAxisMin : (minLeft - bottomSpaceLeft)
-        _rightAxis.axisMinimum = !isnan(_rightAxis.customAxisMin) ? _rightAxis.customAxisMin : (minRight - bottomSpaceRight)
+        // Consider sticking one of the edges of the axis to zero (0.0)
         
-        // consider starting at zero (0)
-        if (_leftAxis.isStartAtZeroEnabled)
+        if _leftAxis.isStartAtZeroEnabled
         {
-            if _leftAxis.axisMinimum < 0.0 && _leftAxis.axisMaximum < 0.0
+            if minLeft < 0.0 && maxLeft < 0.0
             {
                 // If the values are all negative, let's stay in the negative zone
+                _leftAxis.axisMinimum = min(0.0, !isnan(_leftAxis.customAxisMin) ? _leftAxis.customAxisMin : (minLeft - bottomSpaceLeft))
                 _leftAxis.axisMaximum = 0.0
             }
+            else if minLeft >= 0.0
+            {
+                // We have positive values only, stay in the positive zone
+                _leftAxis.axisMinimum = 0.0
+                _leftAxis.axisMaximum = max(0.0, !isnan(_leftAxis.customAxisMax) ? _leftAxis.customAxisMax : (maxLeft + topSpaceLeft))
+            }
             else
             {
-                // We have positive values, stay in the positive zone
-                _leftAxis.axisMinimum = 0.0
+                // Stick the minimum to 0.0 or less, and maximum to 0.0 or more (startAtZero for negative/positive at the same time)
+                _leftAxis.axisMinimum = min(0.0, !isnan(_leftAxis.customAxisMin) ? _leftAxis.customAxisMin : (minLeft - bottomSpaceLeft))
+                _leftAxis.axisMaximum = max(0.0, !isnan(_leftAxis.customAxisMax) ? _leftAxis.customAxisMax : (maxLeft + topSpaceLeft))
             }
         }
-        
-        if (_rightAxis.isStartAtZeroEnabled)
+        else
         {
-            if _rightAxis.axisMinimum < 0.0 && _rightAxis.axisMaximum < 0.0
+            // Use the values as they are
+            _leftAxis.axisMinimum = !isnan(_leftAxis.customAxisMin) ? _leftAxis.customAxisMin : (minLeft - bottomSpaceLeft)
+            _leftAxis.axisMaximum = !isnan(_leftAxis.customAxisMax) ? _leftAxis.customAxisMax : (maxLeft + topSpaceLeft)
+        }
+        
+        if _rightAxis.isStartAtZeroEnabled
+        {
+            if minRight < 0.0 && maxRight < 0.0
             {
                 // If the values are all negative, let's stay in the negative zone
+                _rightAxis.axisMinimum = min(0.0, !isnan(_rightAxis.customAxisMin) ? _rightAxis.customAxisMin : (minRight - bottomSpaceRight))
                 _rightAxis.axisMaximum = 0.0
+            }
+            else if minRight >= 0.0
+            {
+                // We have positive values only, stay in the positive zone
+                _rightAxis.axisMinimum = 0.0
+                _rightAxis.axisMaximum = max(0.0, !isnan(_rightAxis.customAxisMax) ? _rightAxis.customAxisMax : (maxRight + topSpaceRight))
             }
             else
             {
-                // We have positive values, stay in the positive zone
-                _rightAxis.axisMinimum = 0.0
+                // Stick the minimum to 0.0 or less, and maximum to 0.0 or more (startAtZero for negative/positive at the same time)
+                _rightAxis.axisMinimum = min(0.0, !isnan(_rightAxis.customAxisMin) ? _rightAxis.customAxisMin : (minRight - bottomSpaceRight))
+                _rightAxis.axisMaximum = max(0.0, !isnan(_rightAxis.customAxisMax) ? _rightAxis.customAxisMax : (maxRight + topSpaceRight))
             }
+        }
+        else
+        {
+            _rightAxis.axisMinimum = !isnan(_rightAxis.customAxisMin) ? _rightAxis.customAxisMin : (minRight - bottomSpaceRight)
+            _rightAxis.axisMaximum = !isnan(_rightAxis.customAxisMax) ? _rightAxis.customAxisMax : (maxRight + topSpaceRight)
         }
         
         _leftAxis.axisRange = abs(_leftAxis.axisMaximum - _leftAxis.axisMinimum)
@@ -467,9 +490,8 @@ public class BarLineChartViewBase: ChartViewBase, UIGestureRecognizerDelegate
         {
             var bd = _data as! BarChartData
             var space = bd.groupSpace
-            var j = _data.getDataSetByIndex(dataSetIndex)!.entryIndex(entry: entry, isEqual: true)
             
-            var x = CGFloat(j * (_data.dataSetCount - 1) + dataSetIndex) + space * CGFloat(j) + space / 2.0
+            var x = CGFloat(entry.xIndex * (_data.dataSetCount - 1) + dataSetIndex) + space * CGFloat(entry.xIndex) + space / 2.0
             
             xPos += x
             
@@ -695,7 +717,7 @@ public class BarLineChartViewBase: ChartViewBase, UIGestureRecognizerDelegate
     
     @objc private func panGestureRecognized(recognizer: UIPanGestureRecognizer)
     {
-        if (recognizer.state == UIGestureRecognizerState.Began)
+        if (recognizer.state == UIGestureRecognizerState.Began && recognizer.numberOfTouches() > 0)
         {
             stopDeceleration()
             
