@@ -71,7 +71,7 @@
     xl.labelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:10.f];
     xl.drawGridLinesEnabled = NO;
     
-    _sliderX.value = 45.0;
+    _sliderX.value = 100.0;
     _sliderY.value = 100.0;
     [self slidersValueChanged:nil];
 }
@@ -95,26 +95,62 @@
     NSMutableArray *yVals2 = [[NSMutableArray alloc] init];
     NSMutableArray *yVals3 = [[NSMutableArray alloc] init];
     
+    double nseg = count - 4.0;
+    double z = 0.99;                        //Point coordinate affinity
+    double dx = count / 2.0 - 2.0;          //Half window height
+    double dy = (double)count / 2.0 - 1.0;  //Half window width
+    double wx = (double)count / 3.0;        //Ellipse center
+    double hy = range / 2.0;                //Ellipse center
+    
+    double incr = ( count * 0.80 ) / ( count * 0.25 );  // Square pt to pt distance
+
+    double valx,valy;
     for (int i = 0; i < count; i++)
     {
-        double val = (double) (arc4random_uniform(range)) + 3;
-        double valx = (double) (arc4random_uniform(count));
-        [yVals1 addObject:[[ChartDataEntry alloc] initWithValue:val xIndex: valx]];
+        // circle
+        valx = count /2 + count /4 * cos( i / nseg * ( M_PI * 2.0) );
+        valy = count /2 + count /4 * sin( i / nseg * ( M_PI * 2.0) );
+        [yVals1 addObject:[[ChartDataEntry alloc] initWithValue: valy xIndex: valx]];
         
-        val = (double) (arc4random_uniform(range)) + 3;
-        [yVals2 addObject:[[ChartDataEntry alloc] initWithValue:val xIndex:i]];
+        // Square
+        if ( i > count * 0.75 )
+        {
+            valy = ( count * 0.10 ) - ( i - count ) * incr;
+            valx = count * 0.1;
+            [yVals2 addObject:[[ChartDataEntry alloc] initWithValue:valy xIndex:valx]];
+        }
+        else if ( i > count * .50 )
+        {
+            valx = ( count * 0.90 ) - ( i - count / 2 ) * incr;
+            valy = count * 0.9;
+            [yVals2 addObject:[[ChartDataEntry alloc] initWithValue:valy xIndex:valx]];
+        }
+        else if ( i > count * 0.25 )
+        {
+            valy = ( count * 0.1 ) + ( i - count / 4 ) * incr;
+            valx = count * 0.9;
+            [yVals2 addObject:[[ChartDataEntry alloc] initWithValue:valy xIndex:valx]];
+        }
+        else
+        {
+            valx = ( count * 0.10 ) + i * incr;
+            valy = count * 0.1;
+            [yVals2 addObject:[[ChartDataEntry alloc] initWithValue:valy xIndex:valx]];
+        }
         
-        val = (double) (arc4random_uniform(range)) + 3;
-        [yVals3 addObject:[[ChartDataEntry alloc] initWithValue:val xIndex:i]];
+        // elipse
+        valx = wx * sin((double)i / nseg * ( M_PI * 2.0));
+        valy  = hy * cos((double)i / nseg * ( M_PI * 2.0));
+        [yVals3 addObject:[[ChartDataEntry alloc] initWithValue: dy + -valy + z xIndex:  (int)(dx + valx + z ) ]];
     }
     
-    IndependentScatterChartDataSet *set1 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals1 label:@"DS 1"];
+    IndependentScatterChartDataSet *set1 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals1 label:@"Circle"];
     set1.scatterShape = ScatterShapeSquare;
     [set1 setColor:ChartColorTemplates.colorful[0]];
-    IndependentScatterChartDataSet *set2 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals2 label:@"DS 2"];
+    IndependentScatterChartDataSet *set2 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals2 label:@"Square"];
     set2.scatterShape = ScatterShapeCircle;
     [set2 setColor:ChartColorTemplates.colorful[1]];
-    IndependentScatterChartDataSet *set3 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals3 label:@"DS 3"];
+    IndependentScatterChartDataSet *set3 = [[IndependentScatterChartDataSet alloc] initWithYVals:yVals3 label:@"Elipse"];
     set3.scatterShape = ScatterShapeCross;
     [set3 setColor:ChartColorTemplates.colorful[2]];
     
@@ -125,7 +161,9 @@
     set1.drawLinesEnabled   = true;
     set1.valueIsIndex       = true;
     set2.valueIsIndex       = true;
+    set2.drawLinesEnabled   = true;
     set3.valueIsIndex       = true;
+    set3.drawLinesEnabled   = true;
     
     NSMutableArray *dataSets = [[NSMutableArray alloc] init];
     [dataSets addObject:set1];
