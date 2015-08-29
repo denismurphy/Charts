@@ -53,7 +53,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         {
             var set = scatterData.getDataSetByIndex(i)
             
-            if (set !== nil && set!.isVisible)
+            if ( (set !== nil && set!.isVisible) && ( ( set.yMax != 0 ) && ( set.yMax != 0 ) ) )
             {
                 drawDataSet(context: context, dataSet: set as! IndependentScatterChartDataSet)
             }
@@ -189,7 +189,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
             {
                 var dataSet = dataSets[i]
                 
-                if (!dataSet.isDrawValuesEnabled)
+                if ( !dataSet.isDrawValuesEnabled || ( ( dataSet.yMax == 0 ) && ( dataSet.yMin == 0 ) ) )
                 {
                     continue
                 }
