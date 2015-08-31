@@ -179,6 +179,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         var defaultValueFormatter = delegate!.scatterChartDefaultRendererValueFormatter(self);
         var lastPoint = CGPoint();
         var lastIndex = 0;
+        var lastInBounds = false;
         
         // if values are drawn
         if (scatterData.yValCount < Int(ceil(CGFloat(delegate!.scatterChartRendererMaxVisibleValueCount(self)) * viewPortHandler.scaleX)))
@@ -214,31 +215,31 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                 if ( dataSet.drawLinesEnabled )
                 {
                     CGContextSaveGState(context);
+                    CGContextClipToRect( context, viewPortHandler.contentRect );
                 }
+
                 for (var j = 0, count = Int(ceil(CGFloat(positions.count) * _animator.phaseX)); j < count; j++)
                 {
-                    // make sure the lines don't do bad things outside bounds
-                    if ((!viewPortHandler.isInBoundsLeft(positions[j].x)
-                        || !viewPortHandler.isInBoundsY(positions[j].y)))
-                    {
-                        continue
-                    }
-                    
+                    var inBounds = !((!viewPortHandler.isInBoundsLeft(positions[j].x) || !viewPortHandler.isInBoundsY(positions[j].y)));
                     var val = (Double)(j);
+                    var point = CGPoint(x: positions[j].x, y: positions[j].y - shapeSize - lineHeight);
+                    
                     if ( !dataSet.valueIsIndex )
                     {
                         val = entries[j].value;
                     }
                     
-                    var text = formatter!.stringFromNumber(val);
-                    var point = CGPoint(x: positions[j].x, y: positions[j].y - shapeSize - lineHeight);
-                    
-                    ChartUtils.drawText(context: context, text: text!, point: point, align: .Center, attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]);
+                    if ( inBounds )
+                    {
+                        var text = formatter!.stringFromNumber(val);
+                        
+                        ChartUtils.drawText(context: context, text: text!, point: point, align: .Center, attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]);
+                    }
                     
                     if (  ( dataSet.drawLinesEnabled )   &&
                           ( j != 0 )              &&
                           ( j == lastIndex + 1 )  &&
-                          ( viewPortHandler.isInBoundsRight( point.x ) ) )
+                          inBounds )
                     {
                         CGContextSetStrokeColorWithColor(context, dataSet.colorAt(i).CGColor);
                         CGContextMoveToPoint( context, lastPoint.x, lastPoint.y + lineYoffset );
@@ -246,11 +247,19 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                         
                         lastPoint = point;
                         lastIndex = j;
+                        lastInBounds = inBounds;
                     }
                     else
                     {
+                        if ( lastInBounds && ( j == lastIndex + 1 ) )
+                        {
+                            CGContextSetStrokeColorWithColor(context, dataSet.colorAt(i).CGColor);
+                            CGContextMoveToPoint( context, lastPoint.x, lastPoint.y + lineYoffset );
+                            CGContextAddLineToPoint( context, point.x, point.y + lineYoffset );
+                        }
                         lastPoint = point;
                         lastIndex = j;
+                        lastInBounds = inBounds;
                     }
                 }
                 
