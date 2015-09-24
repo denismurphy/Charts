@@ -14,7 +14,7 @@
 
 import UIKit
 
-public class IndependentScatterChartData: BarLineScatterCandleChartData
+public class IndependentScatterChartData: BarLineScatterCandleBubbleChartData
 {
     public override init()
     {
@@ -42,7 +42,7 @@ public class IndependentScatterChartData: BarLineScatterCandleChartData
             
             if (scatterDataSet == nil)
             {
-                println("IndependentScatterChartData: Found a DataSet which is not a ScatterChartDataSet")
+                print("IndependentScatterChartData: Found a DataSet which is not a ScatterChartDataSet", terminator: "\n")
             }
             else
             {

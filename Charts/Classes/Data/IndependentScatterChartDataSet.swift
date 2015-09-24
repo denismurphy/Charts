@@ -15,7 +15,7 @@
 import Foundation
 import CoreGraphics
 
-public class IndependentScatterChartDataSet: BarLineScatterCandleChartDataSet
+public class IndependentScatterChartDataSet: LineScatterCandleChartDataSet
 {
     @objc
     public enum IndependentScatterShape: Int
@@ -37,7 +37,7 @@ public class IndependentScatterChartDataSet: BarLineScatterCandleChartDataSet
     
     public override func copyWithZone(zone: NSZone) -> AnyObject
     {
-        var copy = super.copyWithZone(zone) as! IndependentScatterChartDataSet
+        let copy = super.copyWithZone(zone) as! IndependentScatterChartDataSet
         copy.scatterShapeSize = scatterShapeSize
         copy.scatterShape = scatterShape
         copy.customScatterShape = customScatterShape

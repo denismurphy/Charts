@@ -29,7 +29,7 @@ public protocol IndependentScatterChartRendererDelegate
     func scatterChartRendererMaxVisibleValueCount(renderer: IndependentScatterChartRenderer) -> Int
 }
 
-public class IndependentScatterChartRenderer: ChartDataRendererBase
+public class IndependentScatterChartRenderer: LineScatterCandleRadarChartRenderer
 {
     public weak var delegate: IndependentScatterChartRendererDelegate?
     
@@ -40,9 +40,9 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         self.delegate = delegate
     }
     
-    public override func drawData(#context: CGContext)
+    public override func drawData(context context: CGContext?)
     {
-        var scatterData = delegate!.scatterChartRendererData(self)
+        let scatterData = delegate!.scatterChartRendererData(self)
         
         if (scatterData === nil)
         {
@@ -51,7 +51,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         
         for (var i = 0; i < scatterData.dataSetCount; i++)
         {
-            var set = scatterData.getDataSetByIndex(i)
+            let set = scatterData.getDataSetByIndex(i)
             
             if ( (set !== nil && set!.isVisible) && ( ( set.yMax != 0 ) && ( set.yMax != 0 ) ) )
             {
@@ -62,29 +62,29 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
     
     private var _lineSegments = [CGPoint](count: 2, repeatedValue: CGPoint())
     
-    internal func drawDataSet(#context: CGContext, dataSet: IndependentScatterChartDataSet)
+    internal func drawDataSet(context context: CGContext?, dataSet: IndependentScatterChartDataSet)
     {
-        var trans = delegate!.scatterChartRenderer(self, transformerForAxis: dataSet.axisDependency)
+        let trans = delegate!.scatterChartRenderer(self, transformerForAxis: dataSet.axisDependency)
         
-        var phaseX = _animator.phaseX
-        var phaseY = _animator.phaseY
+        //let phaseX = _animator.phaseX
+        let phaseY = _animator.phaseY
         
         var entries = dataSet.yVals
         
-        var shapeSize = dataSet.scatterShapeSize
-        var shapeHalf = shapeSize / 2.0
+        let shapeSize = dataSet.scatterShapeSize
+        let shapeHalf = shapeSize / 2.0
         
         var point = CGPoint()
         
-        var valueToPixelMatrix = trans.valueToPixelMatrix
+        let valueToPixelMatrix = trans.valueToPixelMatrix
         
-        var shape = dataSet.scatterShape
+        let shape = dataSet.scatterShape
         
         CGContextSaveGState(context)
         
         for (var j = 0, count = Int(min(ceil(CGFloat(entries.count) * _animator.phaseX), CGFloat(entries.count))); j < count; j++)
         {
-            var e = entries[j];
+            let e = entries[j];
             point.x = CGFloat(e.xIndex);
             point.y = CGFloat(e.value) * phaseY;
             point = CGPointApplyAffineTransform(point, valueToPixelMatrix);
@@ -146,7 +146,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
             {
                 CGContextSetFillColorWithColor(context, dataSet.colorAt(j).CGColor)
                 
-                var customShape = dataSet.customScatterShape
+                let customShape = dataSet.customScatterShape
                 
                 if (customShape === nil)
                 {
@@ -168,15 +168,15 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         CGContextRestoreGState(context)
     }
     
-    public override func drawValues(#context: CGContext)
+    public override func drawValues(context context: CGContext?)
     {
-        var scatterData = delegate!.scatterChartRendererData(self)
+        let scatterData = delegate!.scatterChartRendererData(self)
         if (scatterData === nil)
         {
             return
         }
         
-        var defaultValueFormatter = delegate!.scatterChartDefaultRendererValueFormatter(self);
+        let defaultValueFormatter = delegate!.scatterChartDefaultRendererValueFormatter(self);
         var lastPoint = CGPoint();
         var lastIndex = 0;
         var lastInBounds = false;
@@ -188,15 +188,15 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
             
             for (var i = 0; i < scatterData.dataSetCount; i++)
             {
-                var dataSet = dataSets[i]
+                let dataSet = dataSets[i]
                 
                 if ( !dataSet.isDrawValuesEnabled || ( ( dataSet.yMax == 0 ) && ( dataSet.yMin == 0 ) ) )
                 {
                     continue
                 }
                 
-                var valueFont = dataSet.valueFont
-                var valueTextColor = dataSet.valueTextColor
+                let valueFont = dataSet.valueFont
+                let valueTextColor = dataSet.valueTextColor
                 
                 var formatter = dataSet.valueFormatter
                 if (formatter === nil)
@@ -208,9 +208,9 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                 
                 var positions = delegate!.scatterChartRenderer(self, transformerForAxis: dataSet.axisDependency).generateTransformedValuesScatter(entries, phaseY: _animator.phaseY)
                 
-                var shapeSize = dataSet.scatterShapeSize;
-                var lineHeight = valueFont.lineHeight;
-                var lineYoffset = shapeSize + lineHeight;
+                let shapeSize = dataSet.scatterShapeSize;
+                let lineHeight = valueFont.lineHeight;
+                let lineYoffset = shapeSize + lineHeight;
                 
                 if ( dataSet.drawLinesEnabled )
                 {
@@ -220,9 +220,9 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
 
                 for (var j = 0, count = Int(ceil(CGFloat(positions.count) * _animator.phaseX)); j < count; j++)
                 {
-                    var inBounds = !((!viewPortHandler.isInBoundsLeft(positions[j].x) || !viewPortHandler.isInBoundsY(positions[j].y)));
+                    let inBounds = !((!viewPortHandler.isInBoundsLeft(positions[j].x) || !viewPortHandler.isInBoundsY(positions[j].y)));
                     var val = (Double)(j);
-                    var point = CGPoint(x: positions[j].x, y: positions[j].y - shapeSize - lineHeight);
+                    let point = CGPoint(x: positions[j].x, y: positions[j].y - shapeSize - lineHeight);
                     
                     if ( !dataSet.valueIsIndex )
                     {
@@ -231,7 +231,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                     
                     if ( inBounds )
                     {
-                        var text = formatter!.stringFromNumber(val);
+                        let text = formatter!.stringFromNumber(val);
                         
                         ChartUtils.drawText(context: context, text: text!, point: point, align: .Center, attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]);
                     }
@@ -274,17 +274,17 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
     }
     
    
-    public override func drawExtras(#context: CGContext )
+    public override func drawExtras(context context: CGContext? )
     {
         
     }
     
-    public override func drawHighlighted(#context: CGContext, indices: [ChartHighlight])
+    public override func drawHighlighted(context context: CGContext?, indices: [ChartHighlight])
     {
-        var scatterData = delegate!.scatterChartRendererData(self)
-        var chartXMax = delegate!.scatterChartRendererChartXMax(self)
-        var chartYMax = delegate!.scatterChartRendererChartYMax(self)
-        var chartYMin = delegate!.scatterChartRendererChartYMin(self)
+        let scatterData = delegate!.scatterChartRendererData(self)
+        let chartXMax = delegate!.scatterChartRendererChartXMax(self)
+        let chartYMax = delegate!.scatterChartRendererChartYMax(self)
+        let chartYMin = delegate!.scatterChartRendererChartYMin(self)
         
         CGContextSaveGState(context)
         
@@ -292,7 +292,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
         
         for (var i = 0; i < indices.count; i++)
         {
-            var set = scatterData.getDataSetByIndex(indices[i].dataSetIndex) as! IndependentScatterChartDataSet!
+            let set = scatterData.getDataSetByIndex(indices[i].dataSetIndex) as! IndependentScatterChartDataSet!
             
             if (set === nil || !set.isHighlightEnabled)
             {
@@ -310,7 +310,7 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                 CGContextSetLineDash(context, 0.0, nil, 0)
             }
             
-            var xIndex = indices[i].xIndex; // get the x-position
+            let xIndex = indices[i].xIndex; // get the x-position
             
             if (CGFloat(xIndex) > CGFloat(chartXMax) * _animator.phaseX)
             {
@@ -323,14 +323,14 @@ public class IndependentScatterChartRenderer: ChartDataRendererBase
                 continue
             }
             
-            var y = CGFloat(yVal) * _animator.phaseY; // get the y-position
+            let y = CGFloat(yVal) * _animator.phaseY; // get the y-position
             
             pts[0] = CGPoint(x: CGFloat(xIndex), y: CGFloat(chartYMax))
             pts[1] = CGPoint(x: CGFloat(xIndex), y: CGFloat(chartYMin))
             pts[2] = CGPoint(x: 0.0, y: y)
             pts[3] = CGPoint(x: CGFloat(chartXMax), y: y)
             
-            var trans = delegate!.scatterChartRenderer(self, transformerForAxis: set.axisDependency)
+            let trans = delegate!.scatterChartRenderer(self, transformerForAxis: set.axisDependency)
             
             trans.pointValuesToPixel(&pts)
             
