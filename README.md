@@ -1,15 +1,19 @@
+<<<<<<< HEAD
 **Version 2.1.4 IS**, synced to [MPAndroidChart #6ae1eef](https://github.com/PhilJay/MPAndroidChart/commit/6ae1eef)
 
 This Branch of ios-charts contains my IndependentScatterChart enhancement which implements scatter charts that contain XY pairs that are unorded. There are cicumstances where the order of acquisition of XY pairs contains vital information for the analysis. Think of the paths charted below as tracks of animals on a plain. Preserving the order of the XY's allows the analysis of the animals movements over time. The value tags are the sequential order of the pair in the dataset. You may experiment with my enhancement by running the Independent Scatter Chart row in the Charts Demonstration application.
 
 ![alt tag](https://github.com/gjpc/ios-charts/blob/master/screenshots/indiScatterDemo.png)
+=======
+**Version 2.1.5**, synced to [MPAndroidChart #6ae1eef](https://github.com/PhilJay/MPAndroidChart/commit/e3a7b09)
+>>>>>>> upstream/master
 
 ![alt tag](https://raw.github.com/danielgindi/ios-charts/master/Assets/feature_graphic.png)
 [![CodeHunt.io](https://img.shields.io/badge/vote-codehunt.io-02AFD1.svg)](http://codehunt.io/sub/ios-charts/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)   
 
 * Xcode 7 / Swift 2.0
 * iOS 7.0 (Drag .swift files to your project)
-* iOS 8.0 (Use as an **Embedded** Framework)
+* iOS 8.0 / 9.0 (Use as an **Embedded** Framework)
 
 Okay so there's this beautiful library called [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart) by [Philipp Jahoda](https://www.linkedin.com/in/philippjahoda) which has become very popular amongst Android developers, and in the meanwhile there's no decent charting solution for iOS.
 
@@ -37,8 +41,19 @@ If you want to compile for iOS 7:
 
 ## CocoaPods Install
 
-Add `Pod 'Charts'` to your Podfile. "Charts" is the name of the library.  
-**Note:** `Pod 'ios-charts'` is not the correct library, and refers to a different project by someone else.
+Add `pod 'Charts'` to your Podfile. "Charts" is the name of the library.  
+**Note:** ~~`pod 'ios-charts'`~~ is not the correct library, and refers to a different project by someone else.
+
+## Carthage Install
+
+New versions (since v2.1.4) include Carthage prebuilt binaries.
+
+```carthage
+github "danielgindi/ios-charts" == 2.1.5
+github "danielgindi/ios-charts" ~> 2.1.5
+```
+
+In order to build the binaries for a new release, use `carthage build --no-skip-current && carthage archive Charts`.
 
 ## Help
 
@@ -143,8 +158,7 @@ Or you can see the [**ChartsDemo**](https://github.com/danielgindi/ios-charts/tr
 Special Thanks
 =======
 
-Goes to [@petester42](https://github.com/petester42) (Pierre-Marc Airoldi) for implementing a Bubble chart!  
-To [@AlBirdie](https://github.com/AlBirdie) and for [@liuxuan30](https://github.com/liuxuan30) for their contributions and involvement in our community!  
+Goes to [@liuxuan30](https://github.com/liuxuan30), [@petester42](https://github.com/petester42) and  [@AlBirdie](https://github.com/AlBirdie) for new features, bugfixes, and lots and lots of involvement in our open-sourced community! You guys are a huge help to all of those coming here with questions and issues, and I couldn't respond to all of those without you. 
 
 License
 =======
