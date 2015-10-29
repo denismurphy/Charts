@@ -52,7 +52,7 @@
     _chartView.noDataTextDescription = @"You need to provide data for the chart.";
     
     _chartView.drawGridBackgroundEnabled = NO;
-    _chartView.highlightEnabled = YES;
+    _chartView.data.highlightEnabled = YES;
     _chartView.dragEnabled = YES;
     [_chartView setScaleEnabled:YES];
     _chartView.maxVisibleValueCount = 200;
@@ -231,7 +231,7 @@
     
     if ([key isEqualToString:@"toggleHighlight"])
     {
-        _chartView.highlightEnabled = !_chartView.isHighlightEnabled;
+        _chartView.data.highlightEnabled = !_chartView.data.isHighlightEnabled;
         
         [_chartView setNeedsDisplay];
     }

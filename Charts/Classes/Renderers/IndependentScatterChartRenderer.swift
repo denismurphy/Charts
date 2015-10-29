@@ -233,7 +233,7 @@ public class IndependentScatterChartRenderer: LineScatterCandleRadarChartRendere
                     {
                         let text = formatter!.stringFromNumber(val);
                         
-                        ChartUtils.drawText(context: context, text: text!, point: point, align: .Center, attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]);
+                        ChartUtils.drawText(context: context!, text: text!, point: point, align: .Center, attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]);
                     }
                     
                     if (  ( dataSet.drawLinesEnabled )   &&
