@@ -160,8 +160,10 @@
     
     set1.drawLinesEnabled   = true;
     set1.valueIsIndex       = true;
+    
     set2.valueIsIndex       = true;
     set2.drawLinesEnabled   = true;
+    
     set3.valueIsIndex       = true;
     set3.drawLinesEnabled   = true;
     
@@ -171,7 +173,7 @@
     [dataSets addObject:set3];
     
     IndependentScatterChartData *data = [[IndependentScatterChartData alloc] initWithXVals:xVals dataSets:dataSets];
-    [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:7.f]];
+    [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:10.f]];
     
     _chartView.data = data;
 }

@@ -1,4 +1,4 @@
-**Version 2.1.5 IS**, synced to [MPAndroidChart #e3a7b09](https://github.com/PhilJay/MPAndroidChart/commit/e3a7b09)
+**Version 2.2.4 IS**, synced to [MPAndroidChart #e3a7b09](https://github.com/PhilJay/MPAndroidChart/commit/e3a7b09)
 
 This Branch of ios-charts contains my IndependentScatterChart enhancement which implements scatter charts that contain XY pairs that are unorded. There are cicumstances where the order of acquisition of XY pairs contains vital information for the analysis. Think of the paths charted below as tracks of animals on a plain. Preserving the order of the XY's allows the analysis of the animals movements over time. The value tags are the sequential order of the pair in the dataset. You may experiment with my enhancement by running the Independent Scatter Chart row in the Charts Demonstration application.
 

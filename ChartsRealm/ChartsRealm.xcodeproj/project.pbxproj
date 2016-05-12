@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A90FE121CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE111CE52F7400299033 /* RealmIndependentScatterDataSet.swift */; };
+		1A90FE131CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE111CE52F7400299033 /* RealmIndependentScatterDataSet.swift */; };
+		1A90FE141CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE111CE52F7400299033 /* RealmIndependentScatterDataSet.swift */; };
+		1A90FE161CE5300500299033 /* RealmIndependentScatterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE151CE5300500299033 /* RealmIndependentScatterData.swift */; };
+		1A90FE171CE5300500299033 /* RealmIndependentScatterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE151CE5300500299033 /* RealmIndependentScatterData.swift */; };
+		1A90FE181CE5300500299033 /* RealmIndependentScatterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A90FE151CE5300500299033 /* RealmIndependentScatterData.swift */; };
 		5597263B1BDABBDB00E05E59 /* ChartsRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B680D3C1A9D1AD90026A057 /* ChartsRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5B4AC1331C44684E0028D1A6 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B4AC12E1C44684E0028D1A6 /* Realm.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		5B4AC1351C44684E0028D1A6 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B4AC12F1C44684E0028D1A6 /* RealmSwift.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -110,6 +116,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1A90FE111CE52F7400299033 /* RealmIndependentScatterDataSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmIndependentScatterDataSet.swift; sourceTree = "<group>"; };
+		1A90FE151CE5300500299033 /* RealmIndependentScatterData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmIndependentScatterData.swift; sourceTree = "<group>"; };
 		5B4AC12E1C44684E0028D1A6 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
 		5B4AC12F1C44684E0028D1A6 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = "<group>"; };
 		5B4AC1311C44684E0028D1A6 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
@@ -294,6 +302,8 @@
 				5B88D8821C634EBB00B54CBD /* RealmRadarDataSet.swift */,
 				5B88D8831C634EBB00B54CBD /* RealmScatterData.swift */,
 				5B88D8841C634EBB00B54CBD /* RealmScatterDataSet.swift */,
+				1A90FE111CE52F7400299033 /* RealmIndependentScatterDataSet.swift */,
+				1A90FE151CE5300500299033 /* RealmIndependentScatterData.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -403,7 +413,7 @@
 				TargetAttributes = {
 					5BA8EC3F1A9D14DC00CE82E1 = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = EF7AZ55H5Q;
+						DevelopmentTeam = BBGC726JA7;
 					};
 					A52C5C361BAC5CA400594CDD = {
 						CreatedOnToolsVersion = 7.1;
@@ -498,6 +508,8 @@
 			files = (
 				5BA899261CADB7F20012ED64 /* RealmLineRadarDataSet.swift in Sources */,
 				5BA899271CADB7F20012ED64 /* RealmPieDataSet.swift in Sources */,
+				1A90FE141CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */,
+				1A90FE181CE5300500299033 /* RealmIndependentScatterData.swift in Sources */,
 				5BA899281CADB7F20012ED64 /* RealmLineDataSet.swift in Sources */,
 				5BA899291CADB7F20012ED64 /* RealmChartUtils.swift in Sources */,
 				5BA8992A1CADB7F20012ED64 /* RealmScatterDataSet.swift in Sources */,
@@ -524,6 +536,8 @@
 			files = (
 				5B88D8991C634EBB00B54CBD /* RealmLineRadarDataSet.swift in Sources */,
 				5B88D89F1C634EBB00B54CBD /* RealmPieDataSet.swift in Sources */,
+				1A90FE121CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */,
+				1A90FE161CE5300500299033 /* RealmIndependentScatterData.swift in Sources */,
 				5B88D8971C634EBB00B54CBD /* RealmLineDataSet.swift in Sources */,
 				5B4AC1821C4C12B80028D1A6 /* RealmChartUtils.swift in Sources */,
 				5B88D8A71C634EBB00B54CBD /* RealmScatterDataSet.swift in Sources */,
@@ -550,6 +564,8 @@
 			files = (
 				5B88D89A1C634EBB00B54CBD /* RealmLineRadarDataSet.swift in Sources */,
 				5B88D8A01C634EBB00B54CBD /* RealmPieDataSet.swift in Sources */,
+				1A90FE131CE52F7400299033 /* RealmIndependentScatterDataSet.swift in Sources */,
+				1A90FE171CE5300500299033 /* RealmIndependentScatterData.swift in Sources */,
 				5B88D8981C634EBB00B54CBD /* RealmLineDataSet.swift in Sources */,
 				5B4AC1831C4C12B80028D1A6 /* RealmChartUtils.swift in Sources */,
 				5B88D8A81C634EBB00B54CBD /* RealmScatterDataSet.swift in Sources */,
@@ -719,6 +735,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -744,6 +761,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
