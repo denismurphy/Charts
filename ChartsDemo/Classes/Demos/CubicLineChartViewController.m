@@ -8,7 +8,7 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
 #import "CubicLineChartViewController.h"
@@ -51,14 +51,16 @@
                      @{@"key": @"toggleFilled", @"label": @"Toggle Filled"},
                      @{@"key": @"toggleCircles", @"label": @"Toggle Circles"},
                      @{@"key": @"toggleCubic", @"label": @"Toggle Cubic"},
+                     @{@"key": @"toggleHorizontalCubic", @"label": @"Toggle Horizontal Cubic"},
+                     @{@"key": @"toggleStepped", @"label": @"Toggle Stepped"},
                      @{@"key": @"toggleHighlight", @"label": @"Toggle Highlight"},
-                     @{@"key": @"toggleStartZero", @"label": @"Toggle StartZero"},
                      @{@"key": @"animateX", @"label": @"Animate X"},
                      @{@"key": @"animateY", @"label": @"Animate Y"},
                      @{@"key": @"animateXY", @"label": @"Animate XY"},
                      @{@"key": @"saveToGallery", @"label": @"Save to Camera Roll"},
                      @{@"key": @"togglePinchZoom", @"label": @"Toggle PinchZoom"},
                      @{@"key": @"toggleAutoScaleMinMax", @"label": @"Toggle auto scale min/max"},
+                     @{@"key": @"toggleData", @"label": @"Toggle Data"},
                      ];
     
     _chartView.delegate = self;
@@ -79,7 +81,6 @@
     ChartYAxis *yAxis = _chartView.leftAxis;
     yAxis.labelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:12.f];
     [yAxis setLabelCount:6 force:NO];
-    yAxis.startAtZeroEnabled = NO;
     yAxis.labelTextColor = UIColor.whiteColor;
     yAxis.labelPosition = YAxisLabelPositionInsideChart;
     yAxis.drawGridLinesEnabled = NO;
@@ -101,6 +102,17 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)updateChartData
+{
+    if (self.shouldHideData)
+    {
+        _chartView.data = nil;
+        return;
+    }
+    
+    [self setDataCount:(_sliderX.value + 1) range:_sliderY.value];
+}
+
 - (void)setDataCount:(int)count range:(double)range
 {
     NSMutableArray *xVals = [[NSMutableArray alloc] init];
@@ -119,115 +131,95 @@
         [yVals1 addObject:[[ChartDataEntry alloc] initWithValue:val xIndex:i]];
     }
     
-    LineChartDataSet *set1 = [[LineChartDataSet alloc] initWithYVals:yVals1 label:@"DataSet 1"];
-    set1.drawCubicEnabled = YES;
-    set1.cubicIntensity = 0.2;
-    set1.drawCirclesEnabled = NO;
-    set1.lineWidth = 1.8;
-    set1.circleRadius = 4.0;
-    [set1 setCircleColor:UIColor.whiteColor];
-    set1.highlightColor = [UIColor colorWithRed:244/255.f green:117/255.f blue:117/255.f alpha:1.f];
-    [set1 setColor:UIColor.whiteColor];
-    set1.fillColor = UIColor.whiteColor;
-    set1.fillAlpha = 1.f;
-    set1.drawHorizontalHighlightIndicatorEnabled = NO;
-    set1.fillFormatter = [[CubicLineSampleFillFormatter alloc] init];
-    
-    LineChartData *data = [[LineChartData alloc] initWithXVals:xVals dataSet:set1];
-    [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:9.f]];
-    [data setDrawValues:NO];
-    
-    _chartView.data = data;
+    LineChartDataSet *set1 = nil;
+    if (_chartView.data.dataSetCount > 0)
+    {
+        set1 = (LineChartDataSet *)_chartView.data.dataSets[0];
+        set1.yVals = yVals1;
+        _chartView.data.xValsObjc = xVals;
+        [_chartView notifyDataSetChanged];
+    }
+    else
+    {
+        set1 = [[LineChartDataSet alloc] initWithYVals:yVals1 label:@"DataSet 1"];
+        set1.drawCubicEnabled = YES;
+        set1.cubicIntensity = 0.2;
+        set1.drawCirclesEnabled = NO;
+        set1.lineWidth = 1.8;
+        set1.circleRadius = 4.0;
+        [set1 setCircleColor:UIColor.whiteColor];
+        set1.highlightColor = [UIColor colorWithRed:244/255.f green:117/255.f blue:117/255.f alpha:1.f];
+        [set1 setColor:UIColor.whiteColor];
+        set1.fillColor = UIColor.whiteColor;
+        set1.fillAlpha = 1.f;
+        set1.drawHorizontalHighlightIndicatorEnabled = NO;
+        set1.fillFormatter = [[CubicLineSampleFillFormatter alloc] init];
+        
+        LineChartData *data = [[LineChartData alloc] initWithXVals:xVals dataSet:set1];
+        [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:9.f]];
+        [data setDrawValues:NO];
+        
+        _chartView.data = data;
+    }
 }
 
 - (void)optionTapped:(NSString *)key
 {
-    if ([key isEqualToString:@"toggleValues"])
-    {
-        for (ChartDataSet *set in _chartView.data.dataSets)
-        {
-            set.drawValuesEnabled = !set.isDrawValuesEnabled;
-        }
-        
-        [_chartView setNeedsDisplay];
-    }
-    
     if ([key isEqualToString:@"toggleFilled"])
     {
-        for (LineChartDataSet *set in _chartView.data.dataSets)
+        for (id<ILineChartDataSet> set in _chartView.data.dataSets)
         {
             set.drawFilledEnabled = !set.isDrawFilledEnabled;
         }
         
         [_chartView setNeedsDisplay];
+        return;
     }
     
     if ([key isEqualToString:@"toggleCircles"])
     {
-        for (LineChartDataSet *set in _chartView.data.dataSets)
+        for (id<ILineChartDataSet> set in _chartView.data.dataSets)
         {
             set.drawCirclesEnabled = !set.isDrawCirclesEnabled;
         }
         
         [_chartView setNeedsDisplay];
+        return;
     }
     
     if ([key isEqualToString:@"toggleCubic"])
     {
-        for (LineChartDataSet *set in _chartView.data.dataSets)
+        for (id<ILineChartDataSet> set in _chartView.data.dataSets)
         {
             set.drawCubicEnabled = !set.isDrawCubicEnabled;
         }
         
         [_chartView setNeedsDisplay];
+        return;
     }
     
-    if ([key isEqualToString:@"toggleHighlight"])
+    if ([key isEqualToString:@"toggleStepped"])
     {
-        _chartView.data.highlightEnabled = !_chartView.data.isHighlightEnabled;
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleStartZero"])
-    {
-        _chartView.leftAxis.startAtZeroEnabled = !_chartView.leftAxis.isStartAtZeroEnabled;
-        _chartView.rightAxis.startAtZeroEnabled = !_chartView.rightAxis.isStartAtZeroEnabled;
-        
-        [_chartView notifyDataSetChanged];
-    }
-    
-    if ([key isEqualToString:@"animateX"])
-    {
-        [_chartView animateWithXAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateY"])
-    {
-        [_chartView animateWithYAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateXY"])
-    {
-        [_chartView animateWithXAxisDuration:3.0 yAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"saveToGallery"])
-    {
-        [_chartView saveToCameraRoll];
-    }
-    
-    if ([key isEqualToString:@"togglePinchZoom"])
-    {
-        _chartView.pinchZoomEnabled = !_chartView.isPinchZoomEnabled;
+        for (id<ILineChartDataSet> set in _chartView.data.dataSets)
+        {
+            set.drawSteppedEnabled = !set.isDrawSteppedEnabled;
+        }
         
         [_chartView setNeedsDisplay];
     }
     
-    if ([key isEqualToString:@"toggleAutoScaleMinMax"])
+    if ([key isEqualToString:@"toggleHorizontalCubic"])
     {
-        _chartView.autoScaleMinMaxEnabled = !_chartView.isAutoScaleMinMaxEnabled;
-        [_chartView notifyDataSetChanged];
+        for (id<ILineChartDataSet> set in _chartView.data.dataSets)
+        {
+            set.mode = set.mode == LineChartModeCubicBezier ? LineChartModeHorizontalBezier : LineChartModeCubicBezier;
+        }
+        
+        [_chartView setNeedsDisplay];
+        return;
     }
+    
+    [super handleOption:key forChartView:_chartView];
 }
 
 #pragma mark - Actions
@@ -237,7 +229,7 @@
     _sliderTextX.text = [@((int)_sliderX.value + 1) stringValue];
     _sliderTextY.text = [@((int)_sliderY.value) stringValue];
     
-    [self setDataCount:(_sliderX.value + 1) range:_sliderY.value];
+    [self updateChartData];
 }
 
 #pragma mark - ChartViewDelegate

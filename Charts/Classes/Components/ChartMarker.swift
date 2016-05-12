@@ -8,16 +8,17 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
 import Foundation
-import UIKit
+import CoreGraphics
+
 
 public class ChartMarker: ChartComponentBase
 {
     /// The marker image to render
-    public var image: UIImage?
+    public var image: NSUIImage?
     
     /// Use this to return the desired offset you wish the MarkerView to have on the x-axis.
     public var offset: CGPoint = CGPoint()
@@ -53,9 +54,9 @@ public class ChartMarker: ChartComponentBase
         
         let rect = CGRect(x: point.x + offset.x, y: point.y + offset.y, width: size.width, height: size.height)
         
-        UIGraphicsPushContext(context)
+        NSUIGraphicsPushContext(context)
         image!.drawInRect(rect)
-        UIGraphicsPopContext()
+        NSUIGraphicsPopContext()
     }
     
     /// This method enables a custom ChartMarker to update it's content everytime the MarkerView is redrawn according to the data entry it points to.

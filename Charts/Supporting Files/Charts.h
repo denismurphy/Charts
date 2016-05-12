@@ -9,10 +9,16 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
-#import <UIKit/UIKit.h>
+#include <TargetConditionals.h>
+
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	#import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
 
 //! Project version number for Charts.
 FOUNDATION_EXPORT double ChartsVersionNumber;

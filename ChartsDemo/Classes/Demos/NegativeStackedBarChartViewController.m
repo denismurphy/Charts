@@ -8,7 +8,7 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
 #import "NegativeStackedBarChartViewController.h"
@@ -35,10 +35,11 @@
                      @{@"key": @"animateX", @"label": @"Animate X"},
                      @{@"key": @"animateY", @"label": @"Animate Y"},
                      @{@"key": @"animateXY", @"label": @"Animate XY"},
-                     @{@"key": @"toggleStartZero", @"label": @"Toggle StartZero"},
                      @{@"key": @"saveToGallery", @"label": @"Save to Camera Roll"},
                      @{@"key": @"togglePinchZoom", @"label": @"Toggle PinchZoom"},
                      @{@"key": @"toggleAutoScaleMinMax", @"label": @"Toggle auto scale min/max"},
+                     @{@"key": @"toggleData", @"label": @"Toggle Data"},
+                     @{@"key": @"toggleBarBorders", @"label": @"Show Bar Borders"},
                      ];
     
     NSNumberFormatter *customFormatter = [[NSNumberFormatter alloc] init];
@@ -63,9 +64,10 @@
     _chartView.drawValueAboveBarEnabled = YES;
     
     _chartView.leftAxis.enabled = NO;
-    _chartView.rightAxis.startAtZeroEnabled = NO;
-    _chartView.rightAxis.customAxisMax = 25.0;
-    _chartView.rightAxis.customAxisMin = -25.0;
+    _chartView.rightAxis.axisMaxValue = 25.0;
+    _chartView.rightAxis.axisMinValue = -25.0;
+    _chartView.rightAxis.drawGridLinesEnabled = NO;
+    _chartView.rightAxis.drawZeroLineEnabled = YES;
     _chartView.rightAxis.labelCount = 7;
     _chartView.rightAxis.valueFormatter = customFormatter;
     _chartView.rightAxis.labelFont = [UIFont systemFontOfSize:9.f];
@@ -82,6 +84,22 @@
     l.formToTextSpace = 4.f;
     l.xEntrySpace = 6.f;
     
+    [self updateChartData];
+}
+
+- (void)updateChartData
+{
+    if (self.shouldHideData)
+    {
+        _chartView.data = nil;
+        return;
+    }
+    
+    [self setChartData];
+}
+
+- (void)setChartData
+{
     NSMutableArray *yValues = [NSMutableArray array];
     [yValues addObject:[[BarChartDataEntry alloc] initWithValues:@[ @-10, @10 ] xIndex: 0]];
     [yValues addObject:[[BarChartDataEntry alloc] initWithValues:@[ @-12, @13 ] xIndex: 1]];
@@ -95,24 +113,34 @@
     [yValues addObject:[[BarChartDataEntry alloc] initWithValues:@[ @-5, @6 ] xIndex: 9]];
     [yValues addObject:[[BarChartDataEntry alloc] initWithValues:@[ @-1, @2 ] xIndex: 10]];
     
-    BarChartDataSet *set = [[BarChartDataSet alloc] initWithYVals:yValues label:@"Age Distribution"];
-    set.valueFormatter = customFormatter;
-    set.valueFont = [UIFont systemFontOfSize:7.f];
-    set.axisDependency = AxisDependencyRight;
-    set.barSpace = 0.4f;
-    set.colors = @[
-                   [UIColor colorWithRed:67/255.f green:67/255.f blue:72/255.f alpha:1.f],
-                   [UIColor colorWithRed:124/255.f green:181/255.f blue:236/255.f alpha:1.f]
-                   ];
-    set.stackLabels = @[
-                        @"Men", @"Women"
-                        ];
-    
-    NSArray *xVals = @[ @"0-10", @"10-20", @"20-30", @"30-40", @"40-50", @"50-60", @"60-70", @"70-80", @"80-90", @"90-100", @"100+" ];
-    
-    BarChartData *data = [[BarChartData alloc] initWithXVals:xVals dataSet:set];
-    _chartView.data = data;
-    [_chartView setNeedsDisplay];
+    BarChartDataSet *set = nil;
+    if (_chartView.data.dataSetCount > 0)
+    {
+        set = (BarChartDataSet *)_chartView.data.dataSets[0];
+        set.yVals = yValues;
+        [_chartView notifyDataSetChanged];
+    }
+    else
+    {
+        set = [[BarChartDataSet alloc] initWithYVals:yValues label:@"Age Distribution"];
+        set.valueFormatter = _chartView.rightAxis.valueFormatter;
+        set.valueFont = [UIFont systemFontOfSize:7.f];
+        set.axisDependency = AxisDependencyRight;
+        set.barSpace = 0.4f;
+        set.colors = @[
+                       [UIColor colorWithRed:67/255.f green:67/255.f blue:72/255.f alpha:1.f],
+                       [UIColor colorWithRed:124/255.f green:181/255.f blue:236/255.f alpha:1.f]
+                       ];
+        set.stackLabels = @[
+                            @"Men", @"Women"
+                            ];
+        
+        NSArray *xVals = @[ @"0-10", @"10-20", @"20-30", @"30-40", @"40-50", @"50-60", @"60-70", @"70-80", @"80-90", @"90-100", @"100+" ];
+        
+        BarChartData *data = [[BarChartData alloc] initWithXVals:xVals dataSet:set];
+        _chartView.data = data;
+        [_chartView setNeedsDisplay];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -123,69 +151,7 @@
 
 - (void)optionTapped:(NSString *)key
 {
-    if ([key isEqualToString:@"toggleValues"])
-    {
-        for (ChartDataSet *set in _chartView.data.dataSets)
-        {
-            set.drawValuesEnabled = !set.isDrawValuesEnabled;
-        }
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleHighlight"])
-    {
-        _chartView.data.highlightEnabled = !_chartView.data.isHighlightEnabled;
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleHighlightArrow"])
-    {
-        _chartView.drawHighlightArrowEnabled = !_chartView.isDrawHighlightArrowEnabled;
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleStartZero"])
-    {
-        _chartView.leftAxis.startAtZeroEnabled = !_chartView.leftAxis.isStartAtZeroEnabled;
-        _chartView.rightAxis.startAtZeroEnabled = !_chartView.rightAxis.isStartAtZeroEnabled;
-        
-        [_chartView notifyDataSetChanged];
-    }
-    
-    if ([key isEqualToString:@"animateX"])
-    {
-        [_chartView animateWithXAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateY"])
-    {
-        [_chartView animateWithYAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateXY"])
-    {
-        [_chartView animateWithXAxisDuration:3.0 yAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"saveToGallery"])
-    {
-        [_chartView saveToCameraRoll];
-    }
-    
-    if ([key isEqualToString:@"togglePinchZoom"])
-    {
-        _chartView.pinchZoomEnabled = !_chartView.isPinchZoomEnabled;
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleAutoScaleMinMax"])
-    {
-        _chartView.autoScaleMinMaxEnabled = !_chartView.isAutoScaleMinMaxEnabled;
-        [_chartView notifyDataSetChanged];
-    }
+    [super handleOption:key forChartView:_chartView];
 }
 
 #pragma mark - ChartViewDelegate

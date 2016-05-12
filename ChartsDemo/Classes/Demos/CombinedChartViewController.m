@@ -8,7 +8,7 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
 #import "CombinedChartViewController.h"
@@ -34,6 +34,8 @@
                      @{@"key": @"toggleLineValues", @"label": @"Toggle Line Values"},
                      @{@"key": @"toggleBarValues", @"label": @"Toggle Bar Values"},
                      @{@"key": @"saveToGallery", @"label": @"Save to Camera Roll"},
+                     @{@"key": @"toggleData", @"label": @"Toggle Data"},
+                     @{@"key": @"toggleBarBorders", @"label": @"Show Bar Borders"},
                      ];
     
     _chartView.delegate = self;
@@ -54,13 +56,37 @@
     
     ChartYAxis *rightAxis = _chartView.rightAxis;
     rightAxis.drawGridLinesEnabled = NO;
+    rightAxis.axisMinValue = 0.0; // this replaces startAtZero = YES
     
     ChartYAxis *leftAxis = _chartView.leftAxis;
     leftAxis.drawGridLinesEnabled = NO;
+    leftAxis.axisMinValue = 0.0; // this replaces startAtZero = YES
     
     ChartXAxis *xAxis = _chartView.xAxis;
     xAxis.labelPosition = XAxisLabelPositionBothSided;
     
+    [self updateChartData];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)updateChartData
+{
+    if (self.shouldHideData)
+    {
+        _chartView.data = nil;
+        return;
+    }
+    
+    [self setChartData];
+}
+
+- (void)setChartData
+{
     CombinedChartData *data = [[CombinedChartData alloc] initWithXVals:months];
     data.lineData = [self generateLineData];
     data.barData = [self generateBarData];
@@ -71,17 +97,11 @@
     _chartView.data = data;
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)optionTapped:(NSString *)key
 {
     if ([key isEqualToString:@"toggleLineValues"])
     {
-        for (ChartDataSet *set in _chartView.data.dataSets)
+        for (NSObject<IChartDataSet> *set in _chartView.data.dataSets)
         {
             if ([set isKindOfClass:LineChartDataSet.class])
             {
@@ -90,11 +110,12 @@
         }
         
         [_chartView setNeedsDisplay];
+        return;
     }
     
     if ([key isEqualToString:@"toggleBarValues"])
     {
-        for (ChartDataSet *set in _chartView.data.dataSets)
+        for (NSObject<IChartDataSet> *set in _chartView.data.dataSets)
         {
             if ([set isKindOfClass:BarChartDataSet.class])
             {
@@ -103,12 +124,10 @@
         }
         
         [_chartView setNeedsDisplay];
+        return;
     }
     
-    if ([key isEqualToString:@"saveToGallery"])
-    {
-        [_chartView saveToCameraRoll];
-    }
+    [super handleOption:key forChartView:_chartView];
 }
 
 - (LineChartData *)generateLineData
@@ -154,7 +173,7 @@
     [set setColor:[UIColor colorWithRed:60/255.f green:220/255.f blue:78/255.f alpha:1.f]];
     set.valueTextColor = [UIColor colorWithRed:60/255.f green:220/255.f blue:78/255.f alpha:1.f];
     set.valueFont = [UIFont systemFontOfSize:10.f];
-    
+
     set.axisDependency = AxisDependencyLeft;
     
     [d addDataSet:set];
@@ -197,7 +216,7 @@
     
     CandleChartDataSet *set = [[CandleChartDataSet alloc] initWithYVals:entries label:@"Candle DataSet"];
     [set setColor:[UIColor colorWithRed:80/255.f green:80/255.f blue:80/255.f alpha:1.f]];
-    set.bodySpace = 0.3;
+    set.barSpace = 0.3;
     set.valueFont = [UIFont systemFontOfSize:10.f];
     [set setDrawValuesEnabled:NO];
     

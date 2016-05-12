@@ -8,7 +8,7 @@
 //  A port of MPAndroidChart for iOS
 //  Licensed under Apache License 2.0
 //
-//  https://github.com/danielgindi/ios-charts
+//  https://github.com/danielgindi/Charts
 //
 
 #import "SinusBarChartViewController.h"
@@ -37,10 +37,10 @@
                      @{@"key": @"animateX", @"label": @"Animate X"},
                      @{@"key": @"animateY", @"label": @"Animate Y"},
                      @{@"key": @"animateXY", @"label": @"Animate XY"},
-                     @{@"key": @"toggleStartZero", @"label": @"Toggle StartZero"},
                      @{@"key": @"saveToGallery", @"label": @"Save to Camera Roll"},
                      @{@"key": @"togglePinchZoom", @"label": @"Toggle PinchZoom"},
                      @{@"key": @"toggleAutoScaleMinMax", @"label": @"Toggle auto scale min/max"},
+                     @{@"key": @"toggleData", @"label": @"Toggle Data"},
                      ];
     
     _chartView.delegate = self;
@@ -63,17 +63,18 @@
     ChartYAxis *leftAxis = _chartView.leftAxis;
     leftAxis.labelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:10.f];
     leftAxis.labelCount = 6;
-    leftAxis.startAtZeroEnabled = NO;
-    leftAxis.axisMinimum = -2.5;
-    leftAxis.axisMaximum = 2.5;
+    leftAxis.axisMinValue = -2.5;
+    leftAxis.axisMaxValue = 2.5;
+    leftAxis.granularityEnabled = true;
+    leftAxis.granularity = 0.1;
     
     ChartYAxis *rightAxis = _chartView.rightAxis;
     rightAxis.drawGridLinesEnabled = NO;
     rightAxis.labelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:10.f];
     rightAxis.labelCount = 6;
-    rightAxis.startAtZeroEnabled = NO;
-    rightAxis.axisMinimum = -2.5;
-    rightAxis.axisMaximum = 2.5;
+    rightAxis.axisMinValue = -2.5;
+    rightAxis.axisMaxValue = 2.5;
+    rightAxis.granularity = 0.1;
         
     ChartLegend *l = _chartView.legend;
     l.position = ChartLegendPositionBelowChartLeft;
@@ -94,6 +95,17 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)updateChartData
+{
+    if (self.shouldHideData)
+    {
+        _chartView.data = nil;
+        return;
+    }
+    
+    [self setDataCount:(_sliderX.value)];
+}
+
 - (void)setDataCount:(int)count
 {
     NSMutableArray *xVals = [[NSMutableArray alloc] init];
@@ -105,82 +117,31 @@
         [entries addObject:[[BarChartDataEntry alloc] initWithValue:sinf(M_PI * (i % 128) / 64.0) xIndex:i]];
     }
     
-    BarChartDataSet *set = [[BarChartDataSet alloc] initWithYVals:entries label:@"Sinus Function"];
-    set.barSpace = 0.4;
-    [set setColor:[UIColor colorWithRed:240/255.f green:120/255.f blue:124/255.f alpha:1.f]];
-    
-    BarChartData *data = [[BarChartData alloc] initWithXVals:xVals dataSet:set];
-    [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:10.f]];
-    [data setDrawValues:NO];
-    
-    _chartView.data = data;
+    BarChartDataSet *set = nil;
+    if (_chartView.data.dataSetCount > 0)
+    {
+        set = (BarChartDataSet *)_chartView.data.dataSets[0];
+        set.yVals = entries;
+        _chartView.data.xValsObjc = xVals;
+        [_chartView notifyDataSetChanged];
+    }
+    else
+    {
+        set = [[BarChartDataSet alloc] initWithYVals:entries label:@"Sinus Function"];
+        set.barSpace = 0.4;
+        [set setColor:[UIColor colorWithRed:240/255.f green:120/255.f blue:124/255.f alpha:1.f]];
+        
+        BarChartData *data = [[BarChartData alloc] initWithXVals:xVals dataSet:set];
+        [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:10.f]];
+        [data setDrawValues:NO];
+        
+        _chartView.data = data;
+    }
 }
 
 - (void)optionTapped:(NSString *)key
 {
-    if ([key isEqualToString:@"toggleValues"])
-    {
-        for (ChartDataSet *set in _chartView.data.dataSets)
-        {
-            set.drawValuesEnabled = !set.isDrawValuesEnabled;
-        }
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleHighlight"])
-    {
-        _chartView.data.highlightEnabled = !_chartView.data.isHighlightEnabled;
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleHighlightArrow"])
-    {
-        _chartView.drawHighlightArrowEnabled = !_chartView.isDrawHighlightArrowEnabled;
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleStartZero"])
-    {
-        _chartView.leftAxis.startAtZeroEnabled = !_chartView.leftAxis.isStartAtZeroEnabled;
-        _chartView.rightAxis.startAtZeroEnabled = !_chartView.rightAxis.isStartAtZeroEnabled;
-        
-        [_chartView notifyDataSetChanged];
-    }
-    
-    if ([key isEqualToString:@"animateX"])
-    {
-        [_chartView animateWithXAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateY"])
-    {
-        [_chartView animateWithYAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"animateXY"])
-    {
-        [_chartView animateWithXAxisDuration:3.0 yAxisDuration:3.0];
-    }
-    
-    if ([key isEqualToString:@"saveToGallery"])
-    {
-        [_chartView saveToCameraRoll];
-    }
-    
-    if ([key isEqualToString:@"togglePinchZoom"])
-    {
-        _chartView.pinchZoomEnabled = !_chartView.isPinchZoomEnabled;
-        
-        [_chartView setNeedsDisplay];
-    }
-    
-    if ([key isEqualToString:@"toggleAutoScaleMinMax"])
-    {
-        _chartView.autoScaleMinMaxEnabled = !_chartView.isAutoScaleMinMaxEnabled;
-        [_chartView notifyDataSetChanged];
-    }
+    [super handleOption:key forChartView:_chartView];
 }
 
 #pragma mark - Actions
@@ -189,7 +150,7 @@
 {
     _sliderTextX.text = [@((int)_sliderX.value + 1) stringValue];
     
-    [self setDataCount:(_sliderX.value)];
+    [self updateChartData];
 }
 
 #pragma mark - ChartViewDelegate
