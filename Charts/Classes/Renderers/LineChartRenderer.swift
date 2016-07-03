@@ -103,7 +103,7 @@ public class LineChartRenderer: LineRadarChartRenderer
             else { return }
         
         let diff = (entryFrom == entryTo) ? 1 : 0
-        let minx = max(dataSet.entryIndex(entry: entryFrom) - diff, 0)
+        let minx = max(dataSet.entryIndex(entry: entryFrom) - diff - 1, 0)
         let maxx = min(max(minx + 2, dataSet.entryIndex(entry: entryTo) + 1), entryCount)
         
         let phaseX = max(0.0, min(1.0, animator.phaseX))
@@ -313,7 +313,12 @@ public class LineChartRenderer: LineRadarChartRenderer
             entryTo = dataSet.entryForXIndex(self.maxX, rounding: .Up)
             else { return }
         
-        let diff = (entryFrom == entryTo) ? 1 : 0
+        var diff = (entryFrom == entryTo) ? 1 : 0
+        if dataSet.mode == .CubicBezier
+        {
+            diff += 1
+        }
+        
         let minx = max(dataSet.entryIndex(entry: entryFrom) - diff, 0)
         let maxx = min(max(minx + 2, dataSet.entryIndex(entry: entryTo) + 1), entryCount)
         
@@ -577,7 +582,12 @@ public class LineChartRenderer: LineRadarChartRenderer
                     entryTo = dataSet.entryForXIndex(self.maxX, rounding: .Up)
                     else { continue }
                 
-                let diff = (entryFrom == entryTo) ? 1 : 0
+                var diff = (entryFrom == entryTo) ? 1 : 0
+                if dataSet.mode == .CubicBezier
+                {
+                    diff += 1
+                }
+                
                 let minx = max(dataSet.entryIndex(entry: entryFrom) - diff, 0)
                 let maxx = min(max(minx + 2, dataSet.entryIndex(entry: entryTo) + 1), entryCount)
                 
@@ -650,16 +660,27 @@ public class LineChartRenderer: LineRadarChartRenderer
             
             let circleRadius = dataSet.circleRadius
             let circleDiameter = circleRadius * 2.0
-            let circleHoleDiameter = circleRadius
-            let circleHoleRadius = circleHoleDiameter / 2.0
-            let isDrawCircleHoleEnabled = dataSet.isDrawCircleHoleEnabled
+            let circleHoleRadius = dataSet.circleHoleRadius
+            let circleHoleDiameter = circleHoleRadius * 2.0
+            
+            let drawCircleHole = dataSet.isDrawCircleHoleEnabled &&
+                circleHoleRadius < circleRadius &&
+                circleHoleRadius > 0.0
+            let drawTransparentCircleHole = drawCircleHole &&
+                (dataSet.circleHoleColor == nil ||
+                    dataSet.circleHoleColor == NSUIColor.clearColor())
             
             guard let
                 entryFrom = dataSet.entryForXIndex(self.minX < 0 ? 0 : self.minX, rounding: .Down),
                 entryTo = dataSet.entryForXIndex(self.maxX, rounding: .Up)
                 else { continue }
             
-            let diff = (entryFrom == entryTo) ? 1 : 0
+            var diff = (entryFrom == entryTo) ? 1 : 0
+            if dataSet.mode == .CubicBezier
+            {
+                diff += 1
+            }
+            
             let minx = max(dataSet.entryIndex(entry: entryFrom) - diff, 0)
             let maxx = min(max(minx + 2, dataSet.entryIndex(entry: entryTo) + 1), entryCount)
             
@@ -688,17 +709,35 @@ public class LineChartRenderer: LineRadarChartRenderer
                 rect.origin.y = pt.y - circleRadius
                 rect.size.width = circleDiameter
                 rect.size.height = circleDiameter
-                CGContextFillEllipseInRect(context, rect)
                 
-                if (isDrawCircleHoleEnabled)
+                if drawTransparentCircleHole
                 {
-                    CGContextSetFillColorWithColor(context, dataSet.circleHoleColor.CGColor)
+                    // Begin path for circle with hole
+                    CGContextBeginPath(context)
+                    CGContextAddEllipseInRect(context, rect)
                     
-                    rect.origin.x = pt.x - circleHoleRadius
-                    rect.origin.y = pt.y - circleHoleRadius
-                    rect.size.width = circleHoleDiameter
-                    rect.size.height = circleHoleDiameter
+                    // Cut hole in path
+                    CGContextAddArc(context, pt.x, pt.y, circleHoleRadius, 0.0, CGFloat(M_PI_2), 1)
+                    
+                    // Fill in-between
+                    CGContextFillPath(context)
+                }
+                else
+                {
                     CGContextFillEllipseInRect(context, rect)
+                    
+                    if drawCircleHole
+                    {
+                        CGContextSetFillColorWithColor(context, dataSet.circleHoleColor!.CGColor)
+                     
+                        // The hole rect
+                        rect.origin.x = pt.x - circleHoleRadius
+                        rect.origin.y = pt.y - circleHoleRadius
+                        rect.size.width = circleHoleDiameter
+                        rect.size.height = circleHoleDiameter
+                        
+                        CGContextFillEllipseInRect(context, rect)
+                    }
                 }
             }
         }
