@@ -372,7 +372,9 @@ open class LegendRenderer: Renderer
                     
                     if direction == .rightToLeft
                     {
+                        if i < calculatedLabelSizes.count && i >= 0 {
                         posX -= calculatedLabelSizes[i].width
+                        }
                     }
                     
                     drawLabel(
@@ -385,7 +387,9 @@ open class LegendRenderer: Renderer
                     
                     if direction == .leftToRight
                     {
-                        posX += calculatedLabelSizes[i].width
+                        if i < calculatedLabelSizes.count && i >= 0 {
+                            posX += calculatedLabelSizes[i].width
+                        }
                     }
                     
                     posX += direction == .rightToLeft ? -xEntrySpace : xEntrySpace
