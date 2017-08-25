@@ -80,10 +80,10 @@ open class ScatterChartRenderer: LineScatterCandleRadarRenderer
                 point.y = CGFloat(e.y * phaseY)
                 point = point.applying(valueToPixelMatrix)
                 
-                if !viewPortHandler.isInBoundsRight(point.x)
-                {
-                    break
-                }
+                //if !viewPortHandler.isInBoundsRight(point.x)
+                //{
+                //    break
+                //}
                 
                 if !viewPortHandler.isInBoundsLeft(point.x) ||
                     !viewPortHandler.isInBoundsY(point.y)
@@ -151,10 +151,10 @@ open class ScatterChartRenderer: LineScatterCandleRadarRenderer
                     pt.y = CGFloat(e.y * phaseY)
                     pt = pt.applying(valueToPixelMatrix)
                     
-                    if (!viewPortHandler.isInBoundsRight(pt.x))
-                    {
-                        break
-                    }
+                    //if (!viewPortHandler.isInBoundsRight(pt.x))
+                    //{
+                    //    break
+                    //}
                     
                     // make sure the lines don't do shitty things outside bounds
                     if (!viewPortHandler.isInBoundsLeft(pt.x)
